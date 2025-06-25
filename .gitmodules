@@ -1,3 +1,0 @@
-[submodule "data/northwind-SQLite3"]
-	path = data/northwind-SQLite3
-	url = git@github.com:ltoffanettireply/aleph_alpha_workshop_yellow_team.git
