@@ -1,40 +1,43 @@
+from pathlib import Path
 from pharia_skill import ChatParams, Csi, IndexPath, Message, skill
 from pydantic import BaseModel
+from db_service import SQLiteDatabase
+import os
+# TODO: If you have used custom names for these values in the Data Setup step, please use these here
+#NAMESPACE = "Studio" #Document Index Namespace, won't change
+#COLLECTION = "pharia-tutorial-rag"
+#INDEX = "rag-tutorial-index"
+
+
+class Input(BaseModel):
+    question: str
+
+class Output(BaseModel):
+    answer: str | None = None
 
 NAMESPACE = "Studio"
 COLLECTION = "papers"
 INDEX = "asym-64"
 
 
-class Input(BaseModel):
-    question: str
-    namespace: str = NAMESPACE
-    collection: str = COLLECTION
-    index: str = INDEX
-
-
-class Output(BaseModel):
-    answer: str | None
-
-
 @skill
-def custom_rag(csi: Csi, input: Input) -> Output:
-    index = IndexPath(
-        namespace=input.namespace,
-        collection=input.collection,
-        index=input.index,
+def sql_agent(csi: Csi, input: Input) -> Output:
+
+    parent_dir = Path(__file__).parent.parent
+    path_to_db = os.path.join(
+        parent_dir, "data", "northwind-SQLite3", "dist", "northwind.db"
     )
+    print(path_to_db)
+    db = SQLiteDatabase(path_to_db)
+    structure = db.structure()
+    content = f"""Using the provided database structure give a sql query that corresponds to the question.
 
-    if not (documents := csi.search(index, input.question, 3, 0.5)):
-        return Output(answer=None)
-
-    context = "\n".join([d.content for d in documents])
-    content = f"""Using the provided context documents below, answer the following question accurately and comprehensively. If the information is directly available in the context documents, cite it clearly. If not, use your knowledge to fill in the gaps while ensuring that the response is consistent with the given information. Do not fabricate facts or make assumptions beyond what the context or your knowledge base provides. Ensure that the response is structured, concise, and tailored to the specific question being asked.
-
-Input: {context}
+DB structure: {structure}
 
 Question: {input.question}
 """
+    print("#"*10+"PROMPT"+"#"*10)
+    print(content)
     message = Message.user(content)
     params = ChatParams(max_tokens=512)
     response = csi.chat("llama-3.1-8b-instruct", [message], params)
