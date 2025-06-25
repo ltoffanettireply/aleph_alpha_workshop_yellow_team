@@ -18,7 +18,7 @@ async def qa(
     token: str = Depends(get_token),
     kernel: Kernel = Depends(with_kernel),
 ) -> Json:
-    skill = Skill(namespace="app", name="qa")
+    skill = Skill(namespace="customer-playground", name="text_to_sql_yellow_team_qa")
     try:
         response = await kernel.run(skill, token, await request.json())
         return response
