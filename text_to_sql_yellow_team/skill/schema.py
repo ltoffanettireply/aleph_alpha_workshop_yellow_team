@@ -1,4 +1,4 @@
-CREATE TABLE Categories (
+schema="""CREATE TABLE Categories (
     CategoryID    INTEGER,
     PRIMARY KEY (CategoryID),
     CategoryName  TEXT,
@@ -143,4 +143,4 @@ CREATE TABLE Territories (
     RegionID              INTEGER  NOT NULL,
     CONSTRAINT sqlite_autoindex_Territories_1 UNIQUE (TerritoryID),
     FOREIGN KEY (RegionID) REFERENCES Regions (RegionID)
-);
+);"""

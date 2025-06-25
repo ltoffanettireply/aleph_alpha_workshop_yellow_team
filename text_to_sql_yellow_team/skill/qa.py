@@ -2,6 +2,7 @@ from pathlib import Path
 from pharia_skill import ChatParams, Csi, Message, skill
 from pydantic import BaseModel
 import os
+from schema import schema
 
 
 class Input(BaseModel):
@@ -14,17 +15,20 @@ NAMESPACE = "Studio"
 COLLECTION = "papers"
 INDEX = "asym-64"
 
-
 @skill
 def sql_agent(csi: Csi, input: Input) -> Output:
-    with open("schema.txt", "r") as file:
-        structure = file.read()
+
+    # current_file = Path(__file__).resolve()
+    # parent_dir = current_file.parent
+    # schema_path = os.path.join(parent_dir, "schema.py")
+    # with open(schema_path, "r") as file:
+    #     structure = file.read()
     content = f"""Using the provided database structure give a sql query that corresponds to the question.
 
-DB structure: {structure}
-
-Question: {input.question}
-"""
+    DB structure: {schema}
+    
+    Question: {input.question}
+    """
     print("#"*10+"PROMPT"+"#"*10)
     print(content)
     message = Message.user(content)
