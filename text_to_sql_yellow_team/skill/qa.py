@@ -1,7 +1,7 @@
 from pathlib import Path
 from pharia_skill import ChatParams, Csi, IndexPath, Message, skill
 from pydantic import BaseModel
-from db_service import SQLiteDatabase
+#from db_service import SQLiteDatabase
 import os
 # TODO: If you have used custom names for these values in the Data Setup step, please use these here
 #NAMESPACE = "Studio" #Document Index Namespace, won't change
@@ -28,8 +28,8 @@ def sql_agent(csi: Csi, input: Input) -> Output:
         parent_dir, "data", "northwind-SQLite3", "dist", "northwind.db"
     )
     print(path_to_db)
-    db = SQLiteDatabase(path_to_db)
-    structure = db.structure()
+    #db = SQLiteDatabase(path_to_db)
+    structure = " "
     content = f"""Using the provided database structure give a sql query that corresponds to the question.
 
 DB structure: {structure}
