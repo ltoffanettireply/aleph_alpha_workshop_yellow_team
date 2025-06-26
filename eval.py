@@ -37,16 +37,7 @@ if abs_directory not in sys.path:
     sys.path.insert(0, abs_directory)
 
 from qa import sql_agent
-
-# parser = argparse.ArgumentParser(description="Example with a single boolean flag.")
-# parser.add_argument('--upload', action='store_true', help='Enable verbose output')
-# args = parser.parse_args()
-
-class Input(BaseModel):
-    question: str
-
-class Output(BaseModel):
-    answer: str | None = None
+from qa import Input, Output
 
 
 load_dotenv("text_to_sql_yellow_team/skill/.env")
@@ -96,7 +87,8 @@ SingleOutputEvaluationLogic[Input, Output, EvaluationExpectedOutput, QaEvaluatio
 ):
 
     def __init__(self) -> None:
-        self.threshold = 0.5  ## Thrershold to define when an evaluation is passed
+        #self.threshold = 0.5  ## Thrershold to define when an evaluation is passed
+        return
 
     def do_evaluate_single_output(
         self, example: Example[Input, EvaluationExpectedOutput], output: Output
@@ -136,26 +128,6 @@ class QaAggregationLogic(
             pass_rate=pass_rate,
            # average_match_score=average_match_score,
         )
-# test_input = Input(question="What is a transformer?")
-
-# task = QATask()
-# task.run(test_input, NoOpTracer())
-# exit()
-
-# input = Input(question="How many x?")
-# output = Output(
-#     answer="SELECT 123"
-# )
-# example = Example(
-#     input=input,
-#     expected_output=EvaluationExpectedOutput(
-#         query = "SELECT 123"
-#     ),
-# )
-# evaluation_logic = QaEvaluationLogic()
-# evaluation = evaluation_logic.do_evaluate_single_output(example, output)
-# print(evaluation)
-# exit()
 
 
 
@@ -191,7 +163,7 @@ benchmark = benchmark_repository.create_benchmark(
     dataset_id=studio_dataset.id,
     eval_logic=evaluation_logic,
     aggregation_logic=aggregation_logic,
-    name="query-benchmark-7",
+    name="query-benchmark-9",
     description="This benchmark evaluates the model query creation output and the expected output.",
 )
 
