@@ -9,7 +9,11 @@ import os
 from pathlib import Path
 import json
 import argparse
-
+import sqlglot
+from sqlglot.optimizer import optimizer
+from sqlglot.optimizer import optimize
+import re
+import sqlparse
 from intelligence_layer.connectors import StudioClient
 
 from intelligence_layer.core import NoOpTracer, Task, TaskSpan
@@ -27,6 +31,25 @@ from pharia_skill.testing import DevCsi
 
 import sys
 import os
+def remove_aliases(sql):
+    """
+    Remove `AS alias_name` from SELECT clause
+    """
+    # Use regex to remove "AS alias", accounting for optional whitespace
+    return re.sub(r'\s+AS\s+\w+', '', sql, flags=re.IGNORECASE)
+
+def normalize_sql(sql):
+    """
+    Format and normalize SQL string for comparison
+    """
+    # First remove aliases
+    sql = remove_aliases(sql)
+
+    # Format the SQL consistently
+    formatted = sqlparse.format(sql, keyword_case='lower', identifier_case='lower', strip_comments=True, reindent=False)
+
+    # Remove excess whitespace
+    return ' '.join(formatted.split())
 
 # Replace this with your target directory
 directory = test_data_path = os.path.join(Path(__file__).parent, "text_to_sql_yellow_team", "skill") 
@@ -94,8 +117,18 @@ SingleOutputEvaluationLogic[Input, Output, EvaluationExpectedOutput, QaEvaluatio
         self, example: Example[Input, EvaluationExpectedOutput], output: Output
     ) -> QaEvaluation:
         output_text = output.answer
-
-        passed = output_text==example.expected_output.query
+        try:
+            query1 = output_text
+            query2 = example.expected_output.query
+            query1 = normalize_sql(query1)
+            query2 = normalize_sql(query2)
+            expression = optimize(sqlglot.parse_one(query1))
+            query1 = optimizer.normalize(expression, dnf=False).sql()
+            expression = optimize(sqlglot.parse_one(query2))
+            query2 = optimizer.normalize(expression, dnf=False).sql()
+            passed = query1 == query2
+        except Exception as e:
+            passed = output_text==example.expected_output.query
 
         return QaEvaluation(
             passed=passed,
@@ -163,7 +196,7 @@ benchmark = benchmark_repository.create_benchmark(
     dataset_id=studio_dataset.id,
     eval_logic=evaluation_logic,
     aggregation_logic=aggregation_logic,
-    name="query-benchmark-14",
+    name="query-benchmark-16",
     description="This benchmark evaluates the model query creation output and the expected output.",
 )
 
