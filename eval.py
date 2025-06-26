@@ -140,14 +140,14 @@ studio_dataset_repo = StudioDatasetRepository(studio_client=studio_client)
 
 examples = [
     Example(
-        input=Input(question=example["question"]),
+        input=Input(question=example["question"], db_id=example["db_id"]),
         expected_output=EvaluationExpectedOutput(query=example["query"]),
     )
     for example in test_set
 ]
 
 studio_dataset = studio_dataset_repo.create_dataset(
-    examples=examples, dataset_name="test-dataset"
+    examples=examples, dataset_name="test-dataset-schema"
 )
 
 studio_dataset.id
@@ -163,7 +163,7 @@ benchmark = benchmark_repository.create_benchmark(
     dataset_id=studio_dataset.id,
     eval_logic=evaluation_logic,
     aggregation_logic=aggregation_logic,
-    name="query-benchmark-9",
+    name="query-benchmark-14",
     description="This benchmark evaluates the model query creation output and the expected output.",
 )
 
