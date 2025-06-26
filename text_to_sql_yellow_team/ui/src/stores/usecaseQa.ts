@@ -19,6 +19,8 @@ export const useUsecaseQaStore = defineStore('usecase-qa', () => {
       usecaseChatStore.addAnswer(usecaseId, questionId, {
         traceId: '',
         answer: response.answer,
+        query_results: response.query_results,
+        query_error: response.query_error
       })
       isProcessingRequest.value[usecaseId] = false
     } catch (error) {

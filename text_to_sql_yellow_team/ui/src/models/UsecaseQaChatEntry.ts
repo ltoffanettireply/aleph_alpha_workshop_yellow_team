@@ -1,3 +1,5 @@
+import type { QueryResults } from '@/@core/models/api/customRag'
+
 export enum UsecaseQaAnswerStatus {
   PENDING = 'pending',
   FAILED = 'failed',
@@ -7,6 +9,8 @@ export enum UsecaseQaAnswerStatus {
 export type UsecaseQaAnswer = {
   traceId?: string
   answer?: string
+  query_results?: QueryResults
+  query_error?: string
   status: UsecaseQaAnswerStatus
 }
 

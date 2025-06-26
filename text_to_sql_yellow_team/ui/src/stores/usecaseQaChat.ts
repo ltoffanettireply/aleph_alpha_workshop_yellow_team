@@ -7,10 +7,13 @@ import {
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { z } from 'zod'
+import type { QueryResults } from '@/@core/models/api/customRag'
 
 export const SUCCESSFUL_QA_ANSWER_SCHEMA = z.object({
   traceId: z.string(),
   answer: z.string().optional(),
+  query_results: z.any().optional(),
+  query_error: z.string().optional()
 })
 export type SuccessfulQaAnswer = z.infer<typeof SUCCESSFUL_QA_ANSWER_SCHEMA>
 
